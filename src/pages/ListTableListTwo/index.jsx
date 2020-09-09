@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Divider, message, Drawer } from 'antd';
+import { Button, Divider, message, Input, Drawer } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
@@ -13,27 +13,26 @@ import { queryRule, updateRule, addRule, removeRule } from './service';
  */
 
 const handleAdd = async fields => {
-  const hide = message.loading('Adding');
+  const hide = message.loading('正在添加');
 
   try {
     await addRule({ ...fields });
     hide();
-    message.success('Added successfully');
+    message.success('添加成功');
     return true;
   } catch (error) {
     hide();
-    message.error('Adding failed, please try again!');
+    message.error('添加失败请重试！');
     return false;
   }
 };
-
 /**
  * 更新节点
  * @param fields
  */
 
 const handleUpdate = async fields => {
-  const hide = message.loading('Updating');
+  const hide = message.loading('正在配置');
 
   try {
     await updateRule({
@@ -42,11 +41,11 @@ const handleUpdate = async fields => {
       key: fields.key,
     });
     hide();
-    message.success('Update is successful');
+    message.success('配置成功');
     return true;
   } catch (error) {
     hide();
-    message.error('Update failed, please try again!');
+    message.error('配置失败请重试！');
     return false;
   }
 };
@@ -56,7 +55,7 @@ const handleUpdate = async fields => {
  */
 
 const handleRemove = async selectedRows => {
-  const hide = message.loading('Deleting');
+  const hide = message.loading('正在删除');
   if (!selectedRows) return true;
 
   try {
@@ -64,11 +63,11 @@ const handleRemove = async selectedRows => {
       key: selectedRows.map(row => row.key),
     });
     hide();
-    message.success('Deleted successfully, will refresh soon');
+    message.success('删除成功，即将刷新');
     return true;
   } catch (error) {
     hide();
-    message.error('Deletion failed, please try again');
+    message.error('删除失败，请重试');
     return false;
   }
 };
@@ -82,60 +81,76 @@ const TableList = () => {
   const [selectedRowsState, setSelectedRows] = useState([]);
   const columns = [
     {
-      title: 'Name',
+      title: '规则名称',
       dataIndex: 'name',
+      tip: '规则名称是唯一的 key',
       formItemProps: {
         rules: [
           {
             required: true,
-            message: 'Yeu cau nhap',
+            message: '规则名称为必填项',
           },
         ],
       },
       render: (dom, entity) => <a onClick={() => setRow(entity)}>{dom}</a>,
     },
     {
-      title: 'Quantity',
-      dataIndex: 'quantity',
+      title: '描述',
+      dataIndex: 'desc',
+      valueType: 'textarea',
+    },
+    {
+      title: '服务调用次数',
+      dataIndex: 'callNo',
       sorter: true,
+      hideInForm: true,
+      renderText: val => `${val} 万`,
     },
     {
-      title: 'Color',
-      dataIndex: 'color'
-    },
-    {
-      title: 'Image',
-      dataIndex: 'image',
-      
-    },
-    {
-      title: 'Price',
-      dataIndex: 'price',
-      sorter: true,
-    },
-    {
-      title: 'Category',
-      dataIndex: 'category',
-    },
-    {
-      title: 'Size',
-      dataIndex: 'size',    },
-    {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
+      hideInForm: true,
       valueEnum: {
         0: {
-          text: 'Hide',
+          text: '关闭',
           status: 'Default',
         },
         1: {
-          text: 'Show',
+          text: '运行中',
           status: 'Processing',
+        },
+        2: {
+          text: '已上线',
+          status: 'Success',
+        },
+        3: {
+          text: '异常',
+          status: 'Error',
         },
       },
     },
     {
-      title: 'Action',
+      title: '上次调度时间',
+      dataIndex: 'updatedAt',
+      sorter: true,
+      valueType: 'dateTime',
+      hideInForm: true,
+      renderFormItem: (item, { defaultRender, ...rest }, form) => {
+        const status = form.getFieldValue('status');
+
+        if (`${status}` === '0') {
+          return false;
+        }
+
+        if (`${status}` === '3') {
+          return <Input {...rest} placeholder="请输入异常原因！" />;
+        }
+
+        return defaultRender(item);
+      },
+    },
+    {
+      title: '操作',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => (
@@ -146,10 +161,10 @@ const TableList = () => {
               setStepFormValues(record);
             }}
           >
-            UPDATE
+            配置
           </a>
           <Divider type="vertical" />
-          {/* <a href="">DELETE</a> */}
+          <a href="">订阅警报</a>
         </>
       ),
     },
@@ -157,7 +172,7 @@ const TableList = () => {
   return (
     <PageContainer>
       <ProTable
-        headerTitle="LIST PRODUCT"
+        headerTitle="查询表格"
         actionRef={actionRef}
         rowKey="key"
         search={{
@@ -165,7 +180,7 @@ const TableList = () => {
         }}
         toolBarRender={() => [
           <Button type="primary" onClick={() => handleModalVisible(true)}>
-            <PlusOutlined /> ADD
+            <PlusOutlined /> 新建
           </Button>,
         ]}
         request={(params, sorter, filter) => queryRule({ ...params, sorter, filter })}
@@ -178,7 +193,7 @@ const TableList = () => {
         <FooterToolbar
           extra={
             <div>
-              Chosen{' '}
+              已选择{' '}
               <a
                 style={{
                   fontWeight: 600,
@@ -186,9 +201,9 @@ const TableList = () => {
               >
                 {selectedRowsState.length}
               </a>{' '}
-              item&nbsp;&nbsp;
+              项&nbsp;&nbsp;
               <span>
-              Total calls {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)} 万
+                服务调用次数总计 {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)} 万
               </span>
             </div>
           }
@@ -200,9 +215,9 @@ const TableList = () => {
               actionRef.current?.reloadAndRest?.();
             }}
           >
-            Batch Delete
+            批量删除
           </Button>
-          <Button type="primary">Batch Approval</Button>
+          <Button type="primary">批量审批</Button>
         </FooterToolbar>
       )}
       <CreateForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible}>

@@ -1,12 +1,7 @@
-// eslint-disable-next-line import/no-unresolved
 import firebase from "firebase";
-// eslint-disable-next-line import/no-unresolved
 import "firebase/database";
-// eslint-disable-next-line import/no-unresolved
 import "firebase/storage";
-// eslint-disable-next-line import/no-unresolved
 import "firebase/auth";
-// eslint-disable-next-line import/no-unresolved
 import "firebase/firestore";
 
 const config = {
@@ -26,4 +21,4 @@ const firebaseDB = firebase.database();
 const firebaseStorage = firebase.storage();
 const firestore = firebase.firestore();
 
-export { firebaseStorage, firebaseAuth, firebaseDB, firebase, firestore };
+export { firebaseStorage, firebaseAuth, firebaseDB, firestore, firebase };
