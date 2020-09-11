@@ -47,14 +47,13 @@ function getRule(req, res, u) {
   if (sorter) {
     dataSource = dataSource.sort((prev, next) => {
       let sortNumber = 0;
-      Object.keys(sorter).forEach(key => {
+      Object.keys(sorter).forEach((key) => {
         if (sorter[key] === 'descend') {
           if (prev[key] - next[key] > 0) {
             sortNumber += -1;
           } else {
             sortNumber += 1;
           }
-
           return;
         }
 
@@ -72,8 +71,8 @@ function getRule(req, res, u) {
     const filter = JSON.parse(params.filter);
 
     if (Object.keys(filter).length > 0) {
-      dataSource = dataSource.filter(item =>
-        Object.keys(filter).some(key => {
+      dataSource = dataSource.filter((item) =>
+        Object.keys(filter).some((key) => {
           if (!filter[key]) {
             return true;
           }
@@ -89,7 +88,7 @@ function getRule(req, res, u) {
   }
 
   if (params.name) {
-    dataSource = dataSource.filter(data => data.name.includes(params.name || ''));
+    dataSource = dataSource.filter((data) => data.name.includes(params.name || ''));
   }
 
   const result = {
@@ -115,7 +114,7 @@ function postRule(req, res, u, b) {
   switch (method) {
     /* eslint no-case-declarations:0 */
     case 'delete':
-      tableListDataSource = tableListDataSource.filter(item => key.indexOf(item.key) === -1);
+      tableListDataSource = tableListDataSource.filter((item) => key.indexOf(item.key) === -1);
       break;
 
     case 'post':
@@ -146,7 +145,7 @@ function postRule(req, res, u, b) {
     case 'update':
       (() => {
         let newRule = {};
-        tableListDataSource = tableListDataSource.map(item => {
+        tableListDataSource = tableListDataSource.map((item) => {
           if (item.key === key) {
             newRule = { ...item, desc, name };
             return { ...item, desc, name };

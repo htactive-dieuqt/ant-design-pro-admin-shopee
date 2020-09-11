@@ -15,7 +15,7 @@ const formLayout = {
   },
 };
 
-const UpdateForm = props => {
+const UpdateForm = (props) => {
   const [formVals, setFormVals] = useState({
     name: props.values.name,
     desc: props.values.desc,

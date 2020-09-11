@@ -68,12 +68,6 @@ export default defineConfig({
                   component: './Welcome',
                   authority: ['admin'],
                 },
-                {
-                  name: '查询表格',
-                  icon: 'smile',
-                  path: '/admin/listtablelist',
-                  component: './ListTableListTwo',
-                },
               ],
             },
             {
