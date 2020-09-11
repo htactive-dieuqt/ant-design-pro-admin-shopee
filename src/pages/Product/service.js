@@ -1,37 +1,21 @@
 import request from 'umi-request';
-// import { firebaseDB } from '@/Firebase/firebase';
+import { firebaseDB, firebaseStorage } from '@/Firebase/firebase';
 
-export async function queryRule(params) {
-  return request('/api/rule', {
-    params,
+export async function queryRule() {
+  let dataSource = [];
+  const ref = await firebaseDB.ref('products');
+  ref.on('value', (snapshot) => {
+    const result = snapshot.val();
+    dataSource = Object.keys(result).map((key) => ({ id: key, ...result[key] }));
   });
-  // const productRef = await firebaseDB.ref('productVd')
-  //   .get()
-  //   .then(pro => {
-  //     return pro.docs.map(doc => {
-  //       return {
-  //         key: doc.id,
-  //         ...doc.data()
-  //       };
-  //     });
-  //   });
-  // return productRef;
-
-
-  // const ref = await firebaseDB.ref('productVd');
-  // ref.on('value', (snapshot) => {
-  //   const stated = snapshot.val();
-  //   if (stated) {
-      // console.log(stated);
-      //  return stated;
-  //   }
-  // })
-  // console.log('ref',ref);
-
-  //   })
-
-  //   console.log('productRef',productRef);
-  // return productRef;
+  const pageSize = 10;
+  return {
+    data: dataSource,
+    total: 100,
+    success: true,
+    pageSize,
+    current: 0,
+  };
 }
 
 export async function removeRule(params) {
@@ -42,10 +26,34 @@ export async function removeRule(params) {
 }
 
 export async function addRule(params) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: { ...params, method: 'post' },
+  const ref = await firebaseDB.ref('products');
+  ref.push({
+    ...params,
   });
+}
+
+export async function addImage(image) {
+  console.log(image.id);
+  const uploadTask = await firebaseStorage.ref(`images_Category/${image.id}`).put(image);
+  uploadTask.on(
+    'state_change',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (snapshot) => {
+      console.log(snapshot.val());
+    },
+    (error) => {
+      console.log(error, 'hello');
+    },
+    () => {
+      firebaseStorage
+        .ref('images_Category')
+        .child(image.id)
+        .getDownloadURL()
+        .then((url) => {
+          console.log(url);
+        });
+    },
+  );
 }
 
 export async function updateRule(params) {

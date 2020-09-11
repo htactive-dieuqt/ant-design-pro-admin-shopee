@@ -1,30 +1,20 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Drawer } from 'antd';
+import { Button, message, Drawer, Upload } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
-import { queryRule, updateRule, addRule, removeRule } from './service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { queryRule, updateRule, addRule, removeRule, addImage } from './service';
+import { firebaseStorage } from '@/Firebase/firebase';
+import { extend } from 'lodash';
 /**
  * 添加节点
  * @param fields
  */
 
-const handleAdd = async (fields) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('添加成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('添加失败请重试！');
-    return false;
-  }
-};
 /**
  * 更新节点
  * @param fields
@@ -78,10 +68,83 @@ const TableList = () => {
   const actionRef = useRef();
   const [row, setRow] = useState();
   const [selectedRowsState, setSelectedRows] = useState([]);
+  const [fileUpload, setFileUpload] = useState('');
+  const [imag, setImag] = useState('');
+
+  const beforeUpload = (file) => {
+    console.log('image', file);
+    setFileUpload(file);
+  };
+
+  const uploadImage = async (image) => {
+    const uploadTask = firebaseStorage.ref(`/images_Category/${image.uid}/`).put(image);
+    await uploadTask.on(
+      'state_changed',
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      (snapshot) => {
+        console.log(snapshot);
+      },
+      (error) => {
+        console.log(error, 'hello');
+      },
+      () => {
+        firebaseStorage
+          .ref('/images_Category')
+          .child(image.uid)
+          .getDownloadURL()
+          .then((url) => {
+            setImag(url);
+          });
+      },
+    );
+  };
+
+  const handleUpload = () => {
+    uploadImage(fileUpload);
+  };
+
+  const handleAdd = async (fields) => {
+    const hide = message.loading('正在添加');
+    try {
+      await addRule(extend(fields, { image: imag }));
+      hide();
+      message.success('添加成功');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('添加失败请重试！');
+      return false;
+    }
+  };
+
   const columns = [
     {
       title: 'Category',
       dataIndex: 'category',
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+    },
+    {
+      title: 'Image',
+      dataIndex: 'image',
+      valueType: 'file',
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      renderFormItem: (item, { defaultRender, ...rest }, form) => {
+        return (
+          <>
+            <Upload {...rest} beforeUpload={beforeUpload}>
+              <Button>Click to Upload</Button>
+            </Upload>
+            <Button type="primary" style={{ marginTop: 12 }} onClick={handleUpload}>
+              Upload
+            </Button>
+          </>
+        );
+      },
+      // eslint-disable-next-line jsx-a11y/alt-text
+      render: (dom, entity) => <img src={entity.image} style={{ width: 60, height: 60 }} />,
     },
     {
       title: 'Action',

@@ -12,7 +12,7 @@ import { queryRule, updateRule, addRule, removeRule } from './service';
  * @param fields
  */
 
-const handleAdd = async fields => {
+const handleAdd = async (fields) => {
   const hide = message.loading('Adding');
 
   try {
@@ -32,7 +32,7 @@ const handleAdd = async fields => {
  * @param fields
  */
 
-const handleUpdate = async fields => {
+const handleUpdate = async (fields) => {
   const hide = message.loading('Updating');
 
   try {
@@ -55,13 +55,13 @@ const handleUpdate = async fields => {
  * @param selectedRows
  */
 
-const handleRemove = async selectedRows => {
+const handleRemove = async (selectedRows) => {
   const hide = message.loading('Deleting');
   if (!selectedRows) return true;
 
   try {
     await removeRule({
-      key: selectedRows.map(row => row.key),
+      key: selectedRows.map((row) => row.key),
     });
     hide();
     message.success('Deleted successfully, will refresh soon');
@@ -101,12 +101,11 @@ const TableList = () => {
     },
     {
       title: 'Color',
-      dataIndex: 'color'
+      dataIndex: 'color',
     },
     {
       title: 'Image',
       dataIndex: 'image',
-      
     },
     {
       title: 'Price',
@@ -119,7 +118,8 @@ const TableList = () => {
     },
     {
       title: 'Size',
-      dataIndex: 'size',    },
+      dataIndex: 'size',
+    },
     {
       title: 'Status',
       dataIndex: 'status',
@@ -188,7 +188,7 @@ const TableList = () => {
               </a>{' '}
               item&nbsp;&nbsp;
               <span>
-              Total calls {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)} 万
+                Total calls {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)} 万
               </span>
             </div>
           }
@@ -207,7 +207,7 @@ const TableList = () => {
       )}
       <CreateForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible}>
         <ProTable
-          onSubmit={async value => {
+          onSubmit={async (value) => {
             const success = await handleAdd(value);
 
             if (success) {
@@ -225,7 +225,7 @@ const TableList = () => {
       </CreateForm>
       {stepFormValues && Object.keys(stepFormValues).length ? (
         <UpdateForm
-          onSubmit={async value => {
+          onSubmit={async (value) => {
             const success = await handleUpdate(value);
 
             if (success) {

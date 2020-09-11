@@ -3,7 +3,7 @@ import { Form, Button, DatePicker, Input, Modal, Radio, Select, Steps } from 'an
 
 const FormItem = Form.Item;
 const { Step } = Steps;
-const { TextArea } = Input;
+// const { TextArea } = Input;
 const { Option } = Select;
 const RadioGroup = Radio.Group;
 const formLayout = {
@@ -15,7 +15,7 @@ const formLayout = {
   },
 };
 
-const UpdateForm = props => {
+const UpdateForm = (props) => {
   const [formVals, setFormVals] = useState({
     name: props.values.name,
     desc: props.values.desc,
@@ -134,7 +134,7 @@ const UpdateForm = props => {
         >
           <Input placeholder="Please enter" />
         </FormItem>
-        <FormItem
+        {/* <FormItem
           name="desc"
           label="Description"
           rules={[
@@ -146,7 +146,7 @@ const UpdateForm = props => {
           ]}
         >
           <TextArea rows={4} placeholder="Please enter at least 5 characters" />
-        </FormItem>
+        </FormItem> */}
       </>
     );
   };
@@ -232,7 +232,7 @@ const UpdateForm = props => {
           type: formVals.type,
           frequency: formVals.frequency,
           name: formVals.name,
-          desc: formVals.desc,
+          // desc: formVals.desc,
         }}
       >
         {renderContent()}
