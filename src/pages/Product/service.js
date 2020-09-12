@@ -33,23 +33,25 @@ export async function addRule(params) {
 }
 
 export async function addImage(image) {
-  console.log(image.id);
-  const uploadTask = await firebaseStorage.ref(`images_Category/${image.id}`).put(image);
-  uploadTask.on(
-    'state_change',
+  const uploadTask = firebaseStorage.ref(`/images_Product/${image.uid}/`).put(image);
+  await uploadTask.on(
+    'state_changed',
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (snapshot) => {
-      console.log(snapshot.val());
+      // eslint-disable-next-line no-console
+      console.log(snapshot);
     },
     (error) => {
-      console.log(error, 'hello');
+      // eslint-disable-next-line no-console
+      console.log(error, 'dieu');
     },
     () => {
       firebaseStorage
-        .ref('images_Category')
-        .child(image.id)
+        .ref('/images_Product')
+        .child(image.uid)
         .getDownloadURL()
         .then((url) => {
+          // eslint-disable-next-line no-console
           console.log(url);
         });
     },

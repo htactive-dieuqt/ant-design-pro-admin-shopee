@@ -2,14 +2,15 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Button, message, Drawer, Upload } from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
+import { firebaseStorage } from '@/Firebase/firebase';
+import { extend } from 'lodash';
 import ProTable from '@ant-design/pro-table';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { queryRule, updateRule, addRule, removeRule, addImage } from './service';
-import { firebaseStorage } from '@/Firebase/firebase';
-import { extend } from 'lodash';
+
 /**
  * 添加节点
  * @param fields
@@ -72,19 +73,21 @@ const TableList = () => {
   const [imag, setImag] = useState('');
 
   const beforeUpload = (file) => {
-    console.log('image', file);
     setFileUpload(file);
+    // eslint-disable-next-line no-console
+    console.log('image', file);
   };
-
   const uploadImage = async (image) => {
     const uploadTask = firebaseStorage.ref(`/images_Category/${image.uid}/`).put(image);
     await uploadTask.on(
       'state_changed',
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       (snapshot) => {
+        // eslint-disable-next-line no-console
         console.log(snapshot);
       },
       (error) => {
+        // eslint-disable-next-line no-console
         console.log(error, 'hello');
       },
       () => {
